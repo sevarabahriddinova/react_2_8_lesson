@@ -1,12 +1,14 @@
- 
+import {Routes,Route} from "react-router-dom" 
+import Cars from "./routes/Cars"
+import Users from "./routes/Users"
 
 function App() {
-  const [count, setCount] = useState(0)
-
+ 
   return (
-    <>
-    
-    </>
+    <Routes>
+        <Route path="/" element={<Cars/>} />
+        <Route path="/users" element={<Users/>} />
+    </Routes>
   )
 }
 
