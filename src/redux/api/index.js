@@ -1,37 +1,28 @@
-import { createApi,retry,fetchBaseQuery } from "reduxjs/toolkit?query/react"
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-const fetchBaseQuery=async (args,api,extraOption)=>{
-    const {dispatch}=api;
-    const rawBasQuery=fetchBaseQuery({
-        baseurl:"https://fakeapi.platzi.com/en/rest/products",
-        prepareHeaders:(headers) => {
-            const token =localStorage.getItem("token");
-            if(token){
-                headers.set("Authorization", `Bearer ${token}`)
-            }
-            return headers
-        }
-    })
+export const api = createApi({
+  reducerPath: 'api',
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://api.escuelajs.co/api/v1' }),
+  endpoints: (builder) => ({
+    getProducts: builder.query({
+      query: () => '/products',
+    }),
+    updateProduct: builder.mutation({
+      query: ({ id, ...patch }) => ({
+        url: `/products/${id}`,
+        method: 'PATCH',
+        body: patch,
+      }),
+    }),
+    signIn: builder.mutation({
+      query: (credentials) => ({
+        url: '/signin',
+        method: 'POST',
+        body: credentials,
+      }),
+    }),
+  }),
+});
 
-    const response= await rawBasQuery (args,api,extraOption)
+export const { useGetProductsQuery, useUpdateProductMutation, useSignInMutation } = api;
 
-    if(response.error){
-        const {status} = response.error
-
-        if(status===401 || status===403){
-           localStorage.removeItem("token")
-        }
-    }
- 
-
-}
-
-const baseQueryWithRetry=retry(rawBasQuery,{maxRetries:0})
-
-export const api= createApi({
-    reducerPath:"api",
-    baseQuery:baseQueryWithRetry,
-    tageTypes:["PRODUCTS"],
-    endpoints:()=>({}),
-
-})
